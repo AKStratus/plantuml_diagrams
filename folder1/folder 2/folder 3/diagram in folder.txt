@@ -1,6 +1,6 @@
 @startuml
 
-    Alice -> Bob : message 1
+    Alice -> Bob : message 1www
     Alice -> Bob : message 2
 
     newpage
