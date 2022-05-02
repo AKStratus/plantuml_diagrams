@@ -1,6 +1,6 @@
 @startuml
 
-    Alice -> Bob : message ertr
+    Alice -> Bob : message asd
     Alice -> Bob : message 2
 
     newpage
