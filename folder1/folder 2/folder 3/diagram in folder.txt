@@ -1,6 +1,6 @@
 @startuml
 
-    Alice -> Bob : message terte
+    Alice -> Bob : message tesdfsdrte
     Alice -> Bob : message 2
 
     newpage
