@@ -1,6 +1,6 @@
 @startuml
 
-    Alice -> Bob : message 1144
+    Alice -> Bob : message 1155
     Alice -> Bob : message 2
 
     newpage
