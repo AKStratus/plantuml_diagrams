@@ -1,7 +1,7 @@
 @startuml
 
-    Alice -> Bob : message 11
-    Alice -> Bob : message 21
+    Alice -> Bob : message 1
+    Alice -> Bob : message 1
 
     newpage
 
