@@ -2,7 +2,7 @@
 
 actor "Utilisateur"
 
-"Utilisateur"-> Système: some text 433534
+"Utilisateur"-> Système: some text 
 "Utilisateur"<-- Système: Liste des fichiers
 "Utilisateur"-> Système: Sélectionner un ou plusieurs\nfichier(s) et vérifier les URLs
 "Utilisateur"<-- Système: Liste des URLs invalides\ndu/des fichier(s) sélectionné(s)
