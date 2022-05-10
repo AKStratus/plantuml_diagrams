@@ -1,7 +1,7 @@
 @startuml
 note as n
 	ActiveRecord
-	("save yourself")
+	("save yourself 1")
 end note
 
 class DAO{
