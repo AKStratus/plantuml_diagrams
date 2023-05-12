@@ -10,7 +10,7 @@
     A note can also
     be on several lines
     end note
-    note "This note is connected\nto several objects 12345678901." as N2
+    note "This note is connected\nto several objects 1." as N2
     (Start) .. N2
     N2 .. (Use)
 
