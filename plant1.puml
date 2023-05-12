@@ -1,50 +1,42 @@
 @startuml
 
-skinparam component {
-    FontColor          black
-    AttributeFontColor black
-    FontSize           17
-    AttributeFontSize  15
-    AttributeFontname  Droid Sans Mono
-    BackgroundColor    #6A9EFF
-    BorderColor        black
-    ArrowColor         #222266
-}
+skin BlueModern
 
-title "OSCIED Charms Relations (Simple)"
-skinparam componentStyle uml2
+title Publish(er) Jobs Workers (Successful Block Copy)
 
-cloud {
-    interface "JuJu" as juju
-    interface "API" as api
-    interface "Storage" as storage
-    interface "Transform" as transform
-    interface "Publisher" as publisher
-    interface "Website" as website
+'participant "WebUI" as W
+participant "Orchestra" as O
+participant "Storage" as S
+'participant "Transform" as T
+participant "Publisher" as P
 
-    juju - [JuJu]
+activate O
+P -> P: Startup (celeryd -Q queue_name)
+activate P
 
-    website - [WebUI]
-    [WebUI] .up.> juju
-    [WebUI] .down.> storage
-    [WebUI] .right.> api
+P -> O: << get next publish job from queue >>
+O --> P: << next publish job is ... >>
 
-    api - [Orchestra]
-    transform - [Orchestra]
-    publisher - [Orchestra]
-    [Orchestra] .up.> juju
-    [Orchestra] .down.> storage
+note right: <b>concurrency_value</b> jobs can be threated\nsimultaneously (multithreading)
+P -> P: Launch new block copy
+P -> S: << read media from medias path >>
+activate S
+S --> P: << read block 1/N from media >>
+P --> P: << write block 1/N to local web path >>
+P --> O: << update job status & statistics ... >>
+S --> P: << read block 2/N from media >>
+P --> P: << write block 2/N to local web path >>
+S --> P: << read block N/N from media >>
+P --> P: << write block N/N to local web path >>
+S --> P: << end of file >>
+deactivate S
+P --> O: << update job status & statistics ... >>
+P -> O: POST /publish/callback\n  {"job_id": "<uuid_of_job>", "publish_uri": "...", "status": "SUCCESS"}
+activate O
+O -> O: Set media status=PUBLISHED + publish_uris[job_id]=publish_uri into MongoDB
+O --> P: <b>OK 200</b> {"status": 200, value="Your work is much appreciated, thanks !"}
 
-    [Transform] .up.> juju
-    [Transform] .down.> storage
-    [Transform] ..> transform
-
-    [Publisher] .up.> juju
-    [Publisher] .down.> storage
-    [Publisher] ..> publisher
-
-    storage - [Storage]
-    [Storage] .up.> juju
-}
+deactivate P
+deactivate O
 
 @enduml
