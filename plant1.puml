@@ -1,38 +1,50 @@
 @startuml
-start
-:Let entSet be a set of Entitlements to revoke;
-:Add all dependent entitlements to entSet;
-:Delete all dependent entitlements from database;
-:Delete pools of entitlements 
-in entSet that are development pools;
-:Update consumed quantity of entSet;
-:Delete all entSet entitlements
- from database;
-:stackPools = filter Entitlements from entSet that
-have stacking_id attribute;
-partition for-each-entSet {
-:stackPool = find stack pool  
-for entitlement;
-:sSet = find all ents that have the 
-stacking_id;
-:Update stackPool based on sSet;
+
+skinparam component {
+    FontColor          black
+    AttributeFontColor black
+    FontSize           17
+    AttributeFontSize  15
+    AttributeFontname  Droid Sans Mono
+    BackgroundColor    #6A9EFF
+    BorderColor        black
+    ArrowColor         #222266
 }
-:virtEnts = filter Entitlements from entSet that 
-have virt_limit and are for distributors;
-partition for-each-virtEnts {
-if (virt_limit == unlimited) then
--> YES;
-:Set bonus pool quantity to -1;
-else
--> NO;
-:Add back reduced pool quantity;
-endif
+
+title "OSCIED Charms Relations (Simple)"
+skinparam componentStyle uml2
+
+cloud {
+    interface "JuJu" as juju
+    interface "API" as api
+    interface "Storage" as storage
+    interface "Transform" as transform
+    interface "Publisher" as publisher
+    interface "Website" as website
+
+    juju - [JuJu]
+
+    website - [WebUI]
+    [WebUI] .up.> juju
+    [WebUI] .down.> storage
+    [WebUI] .right.> api
+
+    api - [Orchestra]
+    transform - [Orchestra]
+    publisher - [Orchestra]
+    [Orchestra] .up.> juju
+    [Orchestra] .down.> storage
+
+    [Transform] .up.> juju
+    [Transform] .down.> storage
+    [Transform] ..> transform
+
+    [Publisher] .up.> juju
+    [Publisher] .down.> storage
+    [Publisher] ..> publisher
+
+    storage - [Storage]
+    [Storage] .up.> juju
 }
-:mEnts = get all modifier 
-entitlements of entSet entitlements;;
-:Lazily regenerate entitlement certificates 
- for all mEnts;
-:Compute compliance status for all 
-Consumers that have an entitlement in entSet;
-stop
+
 @enduml
