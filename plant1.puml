@@ -1,38 +1,32 @@
 @startuml
-    
-    participant "app: Application" as app
-    participant "cm: ContentManager" as cm
-    participant "item: DownloadItem" as item
-    
-    activate app
-    activate cm
-    
-    note over app: User enters media info page
-    
-    note over app: Check if item exists
-    app->cm: findItem(itemId)
-    cm->cm: lookup(itemId)
-    
-    alt item found
-        cm-->app: item
-    else not found
-        cm-->app: null
-        app->cm: createItem(itemId, contentURL)
-        cm->item: new(itemId, contentURL)
-        activate item
-        cm-->app: item
-    
-        app->cm: loadMetadata()
-        note over cm
-            Download and parse manifest, save in db
-        end note
-        cm-->app: onTracksAvailable
-        cm-->app: onDownloadMetadata
-        note over app: * See //track-selection// flow
-    end group
-    
-    note over app: app is ready to start downloading
-    app->item: startDownload()
-    
-    
-    @enduml
+package "ArduCopter - Simple Version" {
+  [EnginesControl] -down-> Engines
+  [EnginesControl] - [MainCopterProcess]
+  [MainCopterProcess] - [Rangefinder]
+  [Rangefinder] -down-> BottomSonicSensor
+  [MainCopterProcess] -down- [GPSSignalListener]
+}
+package "CarDuino Nano" {
+  [GPSSignalMaker] -down- [MainCarDuinoProcess]
+  [MainCarDuinoProcess] -down- [CommandListener]
+  [GPSSignalMaker] -up- [GPSSignalSender]
+  [MainCarDuinoProcess] - [5x Rangefinders]
+  [5x Rangefinders] -down-> 5xSonicSensors
+  [TelemetricsSender] - [MainCarDuinoProcess]
+  [TelemetricsSender] -down- MiniUSB
+  [CommandListener] -left- MiniUSB
+}
+package "Intell 2800 - Simple Version" {
+  [ComputerCommunications] -up- USB
+  [ComputerCommunications] - [MainComputerProcess]
+  [KinectProcessing] -down-> KINECT
+  [KinectProcessing] - [MainComputerProcess]
+  [VideoProcessing] -down-> Camera
+  [VideoProcessing] - [MainComputerProcess] 
+  [ComputerCommunications2] -up- [MainComputerProcess]
+  [ComputerCommunications2] -down- WiFi
+  [ComputerCommunications2] -down- Bluetooth
+}
+[GPSSignalListener] -down- [GPSSignalSender]
+USB -up- MiniUSB
+@enduml
