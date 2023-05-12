@@ -1,32 +1,42 @@
 @startuml
-package "ArduCopter - Simple Version" {
-  [EnginesControl] -down-> Engines
-  [EnginesControl] - [MainCopterProcess]
-  [MainCopterProcess] - [Rangefinder]
-  [Rangefinder] -down-> BottomSonicSensor
-  [MainCopterProcess] -down- [GPSSignalListener]
-}
-package "CarDuino Nano" {
-  [GPSSignalMaker] -down- [MainCarDuinoProcess]
-  [MainCarDuinoProcess] -down- [CommandListener]
-  [GPSSignalMaker] -up- [GPSSignalSender]
-  [MainCarDuinoProcess] - [5x Rangefinders]
-  [5x Rangefinders] -down-> 5xSonicSensors
-  [TelemetricsSender] - [MainCarDuinoProcess]
-  [TelemetricsSender] -down- MiniUSB
-  [CommandListener] -left- MiniUSB
-}
-package "Intell 2800 - Simple Version" {
-  [ComputerCommunications] -up- USB
-  [ComputerCommunications] - [MainComputerProcess]
-  [KinectProcessing] -down-> KINECT
-  [KinectProcessing] - [MainComputerProcess]
-  [VideoProcessing] -down-> Camera
-  [VideoProcessing] - [MainComputerProcess] 
-  [ComputerCommunications2] -up- [MainComputerProcess]
-  [ComputerCommunications2] -down- WiFi
-  [ComputerCommunications2] -down- Bluetooth
-}
-[GPSSignalListener] -down- [GPSSignalSender]
-USB -up- MiniUSB
+
+actor Utilisateur as user
+participant "formSign.js" as form <<Contrôleur formulaire>>
+participant "Sign.java" as controler <<(C,#ADD1B2) Contrôleur formulaire>>
+participant "Secure.java" as secure <<(C,#ADD1B2) authentification>>
+participant "Security.java" as security <<(C,#ADD1B2) sécurité>>
+
+box "Application Web" #LightBlue
+	participant form
+end box
+
+box "Serveur Play" #LightGreen
+	participant controler
+	participant secure
+	participant security
+end box
+
+user -> form : submitSignIn()
+form -> form : getParameters()
+form -> form : result = checkFields()
+
+alt result
+
+    form -> controler : formSignIn(email,pwd)
+    controler -> controler : result = checkFields()
+    
+    alt result
+    	controler -> secure : Secure.authenticate(email, pwd, true);
+    	secure -> security : onAuthenticated()
+    	security --> form : renderJSON(0);
+    	form --> user : display main page
+    else !result
+    	controler --> form : renderJSON(1)
+    	form --> user : display error
+    end
+    
+else !result
+	form --> user : display error
+end
+
 @enduml
