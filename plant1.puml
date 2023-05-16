@@ -1,32 +1,47 @@
 @startuml
-package "ArduCopter - Simple Version" {
-  [EnginesControl] -down-> Engines
-  [EnginesControl] - [MainCopterProcess]
-  [MainCopterProcess] - [Rangefinder]
-  [Rangefinder] -down-> BottomSonicSensor
-  [MainCopterProcess] -down- [GPSSignalListener]
+
+skinparam rectangle {
+	BackgroundColor DarkSeaGreen
+	FontStyle Bold
+	FontColor DarkGreen
 }
-package "CarDuino Nano" {
-  [GPSSignalMaker] -down- [MainCarDuinoProcess]
-  [MainCarDuinoProcess] -down- [CommandListener]
-  [GPSSignalMaker] -up- [GPSSignalSender]
-  [MainCarDuinoProcess] - [5x Rangefinders]
-  [5x Rangefinders] -down-> 5xSonicSensors
-  [TelemetricsSender] - [MainCarDuinoProcess]
-  [TelemetricsSender] -down- MiniUSB
-  [CommandListener] -left- MiniUSB
-}
-package "Intell 2800 - Simple Version" {
-  [ComputerCommunications] -up- USB
-  [ComputerCommunications] - [MainComputerProcess]
-  [KinectProcessing] -down-> KINECT
-  [KinectProcessing] - [MainComputerProcess]
-  [VideoProcessing] -down-> Camera
-  [VideoProcessing] - [MainComputerProcess] 
-  [ComputerCommunications2] -up- [MainComputerProcess]
-  [ComputerCommunications2] -down- WiFi
-  [ComputerCommunications2] -down- Bluetooth
-}
-[GPSSignalListener] -down- [GPSSignalSender]
-USB -up- MiniUSB
+
+:User: as u
+rectangle Tool as t
+rectangle "Knowledge Base" as kb
+(Robot Framework) as rf
+(DUT) as dut
+
+note as ts
+	test script
+end note
+
+note as act
+	query
+	&
+	action
+end note
+
+note as t_cmt
+	- 执行测试脚本
+	- 按照知识库响应消息
+end note
+
+note as kb_cmt
+	- 根据当前消息确定响应方法
+	- 根据上下文填充消息
+	- 保存信息到相关上下文
+end note
+
+u --> rf
+rf =right=> ts
+ts =down=> t
+
+kb <=left=> act
+act <=up=> t
+
+t = dut
+
+t_cmt -- t
+kb_cmt -left- kb
 @enduml
