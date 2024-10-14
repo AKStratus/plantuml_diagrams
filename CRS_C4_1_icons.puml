@@ -1,0 +1,44 @@
+@startuml ICONS
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+!define DEVICONS https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/devicons
+!define FONTAWESOME https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/font-awesome-5
+!include DEVICONS/code.puml
+!include DEVICONS/go.puml
+!include DEVICONS/mysql.puml
+!include DEVICONS/msql_server.puml
+!include FONTAWESOME/users.puml
+!include FONTAWESOME/aws.puml
+
+Person_Ext(customer, "Customer", $sprite="users")
+Person(scripter, "Agent/Scripter", $sprite="users")
+SystemDb_Ext(inData, "InData", "Scripts, configuration & Profile repository", $sprite="msql_server")
+System_Ext(digiP, "Digital Platform", "Digital Contacts/Cases, embedded in MAX, digital channels", $sprite="aws", $tags="PHP, Lambdas")
+System_Ext(studio, "Studio Client", "Design/Debug scripts", $sprite="code")
+System(vc, "Virtual Cluster", "Workflow engine which runs scripts", $sprite="code")
+System(crs, "Contact Rehydration Service", "Storage suspended contacts and monitors its timeout", $sprite="go")
+SystemDb(crsS3, "CRS Storage", "Serialized contacts", " S3")
+SystemDb(crsTimeout, "CRS Timeout Storage", "Timeout information of suspended contacts", $sprite="mysql")
+System_Ext(inApi, "inContact API", "Digital Contacts/Cases, embedded in MAX, digital channels", $sprite="code")
+
+Rel(customer, digiP, "uses digital chats to communicate with agents")
+
+Rel(scripter, digiP, "configure channels/chats answers chats")
+Rel(scripter, studio, "Design/Debug flows using actions")
+
+Rel(digiP, inApi, "Request start Digital Contacts", "HTTPS")
+Rel(digiP, vc, "Digital Platform events", "grpc insecure")
+
+Rel(inApi, vc, "Starts Digital scripts", "??")
+
+Rel(studio, inData, "Read/write scripts")
+
+Rel(vc, inData, "Read scripts for its execution")
+Rel(vc, crs, "Suspend contacts", "GRPC")
+
+Rel(crs, vc, "Process timeout", "grpc insecure")
+Rel(crs, crsS3, "serialized script")
+Rel(crs, crsTimeout, "timeout info")
+
+SHOW_LEGEND()
+@enduml
