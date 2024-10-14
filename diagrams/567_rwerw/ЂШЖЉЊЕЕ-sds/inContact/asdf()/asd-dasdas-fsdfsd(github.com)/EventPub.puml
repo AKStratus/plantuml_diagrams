@@ -1,0 +1,30 @@
+@startuml EVENTPUB
+
+autonumber
+!define AWSPuml https://raw.githubusercontent.com/awslabs/aws-icons-for-plantuml/v18.0/dist
+!include AWSPuml/AWSCommon.puml
+!include AWSPuml/Compute/Lambda.puml
+!include AWSPuml/Analytics/Kinesis.puml
+
+actor System as user
+KinesisParticipant(case, "de-case-events",)
+LambdaParticipant(relay, "digi-case-cti-relay",)
+participant "Provider\nDigital\nEngagement" as prode
+participant VC
+participant "Provider\nEventPub" as proep
+KinesisParticipant(cti1, "ic-cti-events",)
+participant "MCR" as cti2
+user --> case: Contact Created\nContact Closed
+case --> relay: Subcribed event sent
+relay -> prode: SendCTIEvent
+group Manage in Thread
+    prode -> prode: Validates event
+    prode -> VC: Create new system script "SendCTIEvent"
+    VC -> proep: Execute\nEVENTPUB
+    proep -> proep: Verifies enabled products
+    proep -> proep: Build CTI object
+    proep -> cti1: Send\nAgentAssist CTI
+    proep -> cti2: Send CTI
+end
+prode --> relay: Return ACK Success
+@enduml
