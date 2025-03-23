@@ -15,7 +15,7 @@ title "OSCIED Charms Relations (Simple 14)"
 skinparam componentStyle uml2
 
 cloud {
-    interface "JuJu" as juju
+    interface "JuJu1" as juju
     interface "API" as api
     interface "Storage" as storage
     interface "Transform" as transform
