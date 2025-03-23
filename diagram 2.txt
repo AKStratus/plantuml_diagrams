@@ -1,7 +1,7 @@
 @startuml
 
 skinparam component {
-    FontColor          black
+    FontColor          white
     AttributeFontColor black
     FontSize           17
     AttributeFontSize  15
