@@ -11,7 +11,7 @@ skinparam component {
     ArrowColor         #222266
 }
 
-title "OSCIED Charms Relations (Simple 17)"
+title "OSCIED Charms Relations (Simple 18)"
 skinparam componentStyle uml2
 
 cloud {
